@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Appointment App</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div id="appointmentsContainer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Make a GET request to retrieve appointments from crudcrud.com
+            axios.get('https://crudcrud.com/api/YOUR_CRUDCRUD_API_KEY/appointments')
+                .then(response => {
+                    const appointments = response.data;
+                    displayAppointments(appointments);
+                })
+                .catch(error => {
+                    console.error('GET error:', error);
+                });
+        });
+
+        function displayAppointments(appointments) {
+            const container = document.getElementById('appointmentsContainer');
+
+            if (appointments.length === 0) {
+                container.innerHTML = '<p>No appointments found.</p>';
+                return;
+            }
+
+            const appointmentsList = document.createElement('ul');
+            appointments.forEach(appointment => {
+                const listItem = document.createElement('li');
+                const deleteIcon = document.createElement('span');
+                deleteIcon.innerHTML = '&#x1F5D1;'; // Unicode for a trash bin icon
+                deleteIcon.style.cursor = 'pointer';
+                deleteIcon.addEventListener('click', () => {
+                    // Handle delete operation on icon click
+                    deleteAppointment(appointment._id);
+                    // Remove the user detail from the website
+                    listItem.remove();
+                });
+
+                listItem.textContent = `Date: ${appointment.date}, Time: ${appointment.time}, Patient: ${appointment.patientName}, Doctor: ${appointment.doctorName}`;
+                listItem.appendChild(deleteIcon);
+                appointmentsList.appendChild(listItem);
+            });
+
+            container.appendChild(appointmentsList);
+        }
+
+        function deleteAppointment(appointmentId) {
+            // Make a DELETE request to remove the appointment with the given _id
+            axios.delete(`https://crudcrud.com/api/YOUR_CRUDCRUD_API_KEY/appointments/${appointmentId}`)
+                .then(response => {
+                    console.log('DELETE success:', response.data);
+                })
+                .catch(error => {
+                    console.error('DELETE error:', error);
+                });
+        }
+    </script>
+</body>
+</html>
